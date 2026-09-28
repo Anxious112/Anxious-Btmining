@@ -1,0 +1,105 @@
+--[[
+  anxious_btcmining — ox_inventory items
+  Copy into ox_inventory/data/items.lua (merge with existing entries).
+  Images: add matching .png files to your inventory images folder.
+
+  Item names here must match Config.GpuTiers[x].item / Config.RigModels[x].item
+  / Config.Generator[x].item in config.lua exactly -- rename in both places
+  together if you want different item keys.
+
+  GPUs are non-stacking (stack = false) so each one's `durability` metadata
+  can travel independently between inventory and an installed rig slot.
+  They have no client export -- they're installed/removed via the rig's own
+  ox_target menu, not "used" directly from the hotbar.
+]]
+
+-- ─── GPUs ───────────────────────────────────────────────────────────────────
+-- 20 tiers on the ANX line (see config.lua's Config.GpuTiers for the exact
+-- stats each one carries). Weight climbs with tier since these are
+-- progressively bigger/heavier cards -- purely flavor, doesn't affect sim math.
+['gpu_tier01'] = { label = 'ANX-100 GPU',     weight = 800,  stack = false, close = true, description = 'Entry-level graphics card. Barely dents your power bill.' },
+['gpu_tier02'] = { label = 'ANX-150 GPU',     weight = 820,  stack = false, close = true, description = 'A step up from the base model. Still cool-running.' },
+['gpu_tier03'] = { label = 'ANX-200 GPU',     weight = 850,  stack = false, close = true, description = 'Budget-tier, but a noticeable hashrate bump.' },
+['gpu_tier04'] = { label = 'ANX-250 GPU',     weight = 880,  stack = false, close = true, description = 'Solid low-tier card for a starter rig.' },
+['gpu_tier05'] = { label = 'ANX-300 GPU',     weight = 920,  stack = false, close = true, description = 'Draws more power, mines noticeably faster.' },
+['gpu_tier06'] = { label = 'ANX-400 GPU',     weight = 960,  stack = false, close = true, description = 'A genuine mid-tier workhorse.' },
+['gpu_tier07'] = { label = 'ANX-500 GPU',     weight = 1000, stack = false, close = true, description = 'Runs warm under sustained load.' },
+['gpu_tier08'] = { label = 'ANX-600 GPU',     weight = 1050, stack = false, close = true, description = 'Popular pick for a serious mid-game rig.' },
+['gpu_tier09'] = { label = 'ANX-700 GPU',     weight = 1100, stack = false, close = true, description = 'Getting into high-draw territory -- watch your heat.' },
+['gpu_tier10'] = { label = 'ANX-800 GPU',     weight = 1150, stack = false, close = true, description = 'Serious hashrate. Serious power draw.' },
+['gpu_tier11'] = { label = 'ANX-900 GPU',     weight = 1200, stack = false, close = true, description = 'Enthusiast-tier. Needs decent cooling.' },
+['gpu_tier12'] = { label = 'ANX-1000 GPU',    weight = 1260, stack = false, close = true, description = 'Four digits of model number, four digits of heat output.' },
+['gpu_tier13'] = { label = 'ANX-1200 GPU',    weight = 1320, stack = false, close = true, description = 'High-end silicon. Runs hot fast.' },
+['gpu_tier14'] = { label = 'ANX-1400 GPU',    weight = 1380, stack = false, close = true, description = 'Not for underpowered chassis.' },
+['gpu_tier15'] = { label = 'ANX-1600 GPU',    weight = 1450, stack = false, close = true, description = 'Serious rig required. Serious payout too.' },
+['gpu_tier16'] = { label = 'ANX-1800 GPU',    weight = 1520, stack = false, close = true, description = 'Near the top of the lineup. Punishing heat curve.' },
+['gpu_tier17'] = { label = 'ANX-2000 GPU',    weight = 1600, stack = false, close = true, description = 'Flagship-adjacent. Manage your cooling carefully.' },
+['gpu_tier18'] = { label = 'ANX-2200 GPU',    weight = 1680, stack = false, close = true, description = 'Enormous hashrate, enormous fire risk.' },
+['gpu_tier19'] = { label = 'ANX-2400 GPU',    weight = 1760, stack = false, close = true, description = 'One tier from the top of the line.' },
+['gpu_tier20'] = { label = 'ANX-2600 Ti GPU', weight = 1850, stack = false, close = true, description = 'The absolute ceiling. Maximum hashrate, maximum meltdown risk.' },
+
+-- ─── Rig chassis ────────────────────────────────────────────────────────────
+-- Placeable -- using this item starts ghost-preview placement, same pattern
+-- as any other placeable prop item in this codebase.
+['mining_rig_chassis'] = {
+    label = 'Mining Rig',
+    weight = 25000,
+    stack = false,
+    close = true,
+    consume = 0,
+    description = 'A rig chassis with slots for GPUs. Place it somewhere secure.',
+    client = {
+        export = 'anxious_btcmining.usePlaceable',
+    },
+},
+
+-- ─── Power ──────────────────────────────────────────────────────────────────
+-- Prefixed (not just "generator_small"/"generator_fuel") -- those are
+-- generic enough names to collide with other resources' items on a real
+-- server (e.g. drug-lab scripts commonly ship their own "generator_small").
+-- ox_inventory silently lets whichever definition loads last win, which
+-- breaks the other resource's export -- confirmed this collides with
+-- plt-illegal-jobs' generator items while deploying to the test server.
+['btc_generator_small'] = {
+    label = 'Small Generator',
+    weight = 18000,
+    stack = false,
+    close = true,
+    consume = 0,
+    description = 'Portable generator, low wattage capacity.',
+    client = {
+        export = 'anxious_btcmining.usePlaceable',
+    },
+},
+
+['btc_generator_large'] = {
+    label = 'Large Generator',
+    weight = 32000,
+    stack = false,
+    close = true,
+    consume = 0,
+    description = 'Heavy-duty generator, high wattage capacity.',
+    client = {
+        export = 'anxious_btcmining.usePlaceable',
+    },
+},
+
+['btc_generator_fuel'] = {
+    label = 'Generator Fuel Can',
+    weight = 4000,
+    stack = true,
+    close = true,
+    description = 'Fuel for a placed generator.',
+},
+
+-- ─── Fire response ──────────────────────────────────────────────────────────
+-- Required to trigger the "Extinguish Fire" ox_target option on a burning
+-- rig (see Config.Heat.extinguisherItem). Not consumed on use -- it's a
+-- reusable tool, not a single-charge item.
+['fire_extinguisher'] = {
+    label = 'Fire Extinguisher',
+    weight = 3500,
+    stack = false,
+    close = true,
+    description = 'Dry chemical extinguisher. Rated for electrical fires.',
+},
